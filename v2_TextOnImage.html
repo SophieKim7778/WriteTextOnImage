@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>텍스트 이미지 자동 생성 애플리케이션</title>
+
+    <style>
+        .card-registration .select-input.form-control[readonly]:not([disabled]) {
+            font-size: 1rem;
+            line-height: 2.15;
+            padding-left: .75em;
+            padding-right: .75em;
+        }
+
+        .card-registration .select-arrow {
+            top: 13px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <section class="h-100 bg-dark">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-left align-items-center h-100">
+                <div class="col-md-6 col-12">
+                    <div class="card card-registration my-4">
+                        <div class="row g-0">
+                            <div class="col-xl-12">
+                                <div class="card-body p-md-5 text-black">
+                                    <h3 class="mb-5 text-uppercase">텍스트 이미지 자동 생성 애플리케이션</h3>
+                                    <div class="form-outline mb-4">
+                                        <label class="form-label" for="imageFile">배경 이미지 업로드</label>
+                                        <input type="file" id="imageFile" class="form-control form-control-lg" accept="image/png, image/gif, image/jpeg"/>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <label class="form-label" for="excelFile">엑셀 파일 업로드</label>
+                                        <input type="file" id="excelFile" class="form-control form-control-lg" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="font_size_name">이름 폰트 크기 :</label>
+                                                <input type="text" id="font_size_name" placeholder="20px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 mb-4">
+                                            <div class="form-outline" style="margin-top:8px;">
+                                                <label class="form-label" for="font_weight_name"></label>
+                                                <input type="button" data-weight="light" class="form-control form-control-lg" id="font_weight_name" value="굵게" onclick="checkBold(this);">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="font_size_department">소속 폰트 크기 :</label>
+                                                <input type="text" id="font_size_department" placeholder="15px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 mb-4">
+                                            <div class="form-outline" style="margin-top:8px;">
+                                                <label class="form-label" for="font_weight_name"></label>
+                                                <input type="button" data-weight="light" class="form-control form-control-lg" id="font_weight_department" value="굵게" onclick="checkBold(this);">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="font_kor">한글 폰트(google font) : </label>
+                                                <input type="text" id="font_kor" placeholder="Nanum Pen Script" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="font_eng">영문 폰트(google font) : </label>
+                                                <input type="text" id="font_eng" placeholder="Smokum" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="padding_top">여백(상) : </label>
+                                                <input type="text" id="padding_top" placeholder="20px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="padding_side">여백(좌우) : </label>
+                                                <input type="text" id="padding_side" placeholder="20px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="line_height">줄 간격 : </label>
+                                                <input type="text" id="line_height" placeholder="15px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="next_text_height">항목 간격 : </label>
+                                                <input type="text" id="next_text_height" placeholder="25px" class="form-control form-control-lg" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                   
+
+                                    <div class="d-flex justify-content-end pt-3">
+                                        <button type="button" class="btn btn-light btn-lg" onclick="previewImages(this);">
+                                            <span class="spinner-grow spinner-grow-sm" role="status" style="display:none;"></span> 미리보기</button>
+                                        <button type="button" class="btn btn-warning btn-lg ms-2"  onclick="downloadPDF(this);">
+                                            <span class="spinner-grow spinner-grow-sm" role="status" style="display:none;"></span> pdf파일 다운로드</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="previewCanvas">
+                <!-- 여기에 미리보기 canvas 추가 -->
+            </div>
+            <canvas style="display: none;" id="canvas"></canvas>
+            <!-- <canvas style="display: none;" id="text_canvas"></canvas> -->
+        
+
+        </div>
+    </section>
+</body>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+    // 폰트 적용
+    let font_eng = 'Smokum';
+    let font_kor = 'Nanum Pen Script';
+    let font_size_name = 20;
+    let font_size_department = 15;
+    let padding_top = 20;
+    let padding_side = 20;
+    let line_height = 15;
+    let next_text_height = 25;
+    let font_weight_name = '';
+    let font_weight_department = '';
+
+    window.jsPDF = window.jspdf.jsPDF;
+
+    const canvas = document.getElementById("canvas");
+    const image = new Image(); 
+    canvas.width = image.width;
+    canvas.height = image.height;
+    
+    // 이미지 크기 조절할 경우 
+    // image.style.width = '50%';
+    // image.style.height = 'auto';
+    
+    function checkBold(obj){
+        var weight = $(obj).data('weight');
+        if(weight == 'light'){
+            $(obj).css('background-color', '#86b7fe');
+            $(obj).data('weight', 'bold');
+        }else{
+            $(obj).css('background-color', 'white');
+            $(obj).data('weight', 'light');
+        }
+    }
+
+    function checkLoading(obj, flag){
+        if(flag){
+            $(obj).addClass('btn-dark');
+            $(obj).prop('disabled');
+            $(obj).find('span').show();
+        }else{
+            $(obj).removeClass('btn-dark');
+            $(obj).removeProp('disabled');
+            $(obj).find('span').hide(); 
+        }
+    }
+    function previewImages(obj){
+        checkLoading(obj, true);
+
+        if($('#imageFile')[0].files.length <=0){
+            checkLoading(obj, false);
+            alert('이미지 첨부 파일이 없습니다. 첨부 후 시도해주세요.');
+            return;
+        }
+        if($('#excelFile')[0].files.length <=0){
+            alert('엑셀 첨부 파일이 없습니다. 첨부 후 시도해주세요.');
+            checkLoading(obj, false);
+            return;
+        }
+        const reader1 = new FileReader();
+        const imageFile = $('#imageFile')[0].files[0];
+        // 이미지가 로드가 된 경우
+        reader1.onload = e => {
+            image.src = e.target.result;
+        }
+        // reader가 이미지 읽도록 하기
+        reader1.readAsDataURL(imageFile);
+        
+        $('#previewCanvas').empty();
+        const reader2 = new FileReader();
+        let excel_data= new Array();
+        // 엑셀 파일 가져와서 읽기
+        const excelFile = $('#excelFile')[0].files[0];
+       // const reader = new FileReader();
+        reader2.onload = () => {
+            const data = reader2.result;
+            const workBook = XLSX.read(data, { type: 'binary' });
+            
+            workBook.SheetNames.forEach(sheetName => {
+                excel_data = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
+
+                // 그림 미리보기
+                drawImageActualSize(excel_data);
+            });
+        };
+        reader2.readAsBinaryString(excelFile);    
+        checkLoading(obj, false);    
+    }
+   
+
+    // 미리보기
+    function drawImageActualSize(excel_data) {
+        // 입력값 확인하기
+        if($.trim($('#font_kor').val()) != '') font_kor = $.trim($('#font_kor').val());
+        if($.trim($('#font_eng').val()) != '') font_eng = $.trim($('#font_eng').val());
+        if($('#font_size_name').val() ) font_size_name = parseInt($('#font_size_name').val());
+        if($('#font_size_department').val()) font_size_department = parseInt($('#font_size_department').val());
+        if($('#padding_top').val()) padding_top = parseInt($('#padding_top').val());
+        if($('#padding_side').val()) padding_side = parseInt($('#padding_side').val());
+        if($('#line_height').val()) line_height = parseInt($('#line_height').val());
+        if($('#next_text_height').val()) next_text_height = parseInt($('#next_text_height').val());
+        font_weight_name = $('#font_weight_name').data('weight');
+        font_weight_department = $('#font_weight_department').data('weight');
+
+        WebFont.load({
+            google: { 
+                families: [font_eng, font_kor] 
+            },
+            active: function() {
+                $.each(excel_data, function(idx, data){      
+
+                    var eachCanvas = document.createElement('canvas');
+                    eachCanvas.className = 'preview';
+                    eachCanvas.width = image.width;
+                    eachCanvas.height = image.height;
+                    
+                    
+                    let text_x = eachCanvas.width/2;
+                    var text_y = 0;
+                    var maxTextWidth = image.width - padding_side;
+                    
+                    var eachCtx = eachCanvas.getContext('2d');
+                    eachCtx.textAlign = 'center';
+                    eachCtx.textBaseline = 'middle';
+
+                    let check_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+                    // 글자수 체크 후 줄바꿈
+                    // 이름
+                    eachCtx.font = font_size_name +'px '+ (check_kor.test(data.name[0])? font_kor: font_eng);
+                    text_y = wrapText(eachCtx, data.name, text_x, text_y, maxTextWidth, line_height);
+                    text_y += (line_height + next_text_height);
+                    // 소속
+                    eachCtx.font = font_size_department +'px '+ (check_kor.test(data.department[0])? font_kor: font_eng);
+                    text_y = wrapText(eachCtx, data.department, text_x, text_y, maxTextWidth, line_height);
+                    
+     
+                    
+                    text_y = (image.height - text_y) / 2 + padding_top;  // 텍스트 시작점
+                    eachCtx.clearRect(0, 0, image.width, image.height);
+                    eachCtx.drawImage(image, 0, 0);
+                    // 이름
+                    eachCtx.font = font_size_name +'px '+ (check_kor.test(data.name[0])? font_kor: font_eng);
+                    text_y = wrapText(eachCtx, data.name, text_x, text_y, maxTextWidth, line_height);
+                    text_y += (line_height + next_text_height);
+                    // 소속
+                    eachCtx.font = font_size_department +'px '+ (check_kor.test(data.department[0])? font_kor: font_eng);
+                    text_y = wrapText(eachCtx, data.department, text_x, text_y, maxTextWidth, line_height);
+                  
+        
+                    $('#previewCanvas').append(eachCanvas).append('<br>');
+                    
+                });
+            }
+        }); 
+    }
+
+    
+    // 글자수 체크 후 줄바꿈
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        var words = text.split(' ');
+        var line = '';
+
+        for(var n = 0; n < words.length; n++) {
+            var testLine = line + words[n] + ' ';
+            var metrics = ctx.measureText(testLine);
+            var testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0 || words[n].startsWith('^') && n >0) {
+                ctx.fillText(line, x, y);
+                line = words[n].replace('^','') + ' ';
+                y += lineHeight;
+            }
+            else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, x, y);
+        return y; // 현 y값 위치 반환
+    }
+
+    //pdf 파일로 저장
+    function downloadPDF(obj){
+        checkLoading(obj, true);
+        var imgData = $('#previewCanvas').find('.preview');
+        if (imgData.length <= 0){
+            checkLoading(obj, false);
+            alert('미리보기 이미지가 없습니다. 미리보기를 먼저 진행해주세요.');
+            return;
+        }
+        if($('#excelFile')[0].files.length <=0){
+            checkLoading(obj, false);
+            alert('첨부 파일이 없습니다. 첨부 후 시도해주세요.');
+            return;
+        }
+        // 가로 세로 설정
+        let direction = 'p';
+        if(image.width >= image.height) direction = 'l';
+        var doc = new jsPDF(direction, 'px', [image.width, image.height]);
+        
+        $.each(imgData, function(idx, img){
+            img.toDataURL('image/jpg', 1.0);
+            doc.addImage(img, 'jpg', 0, 0, image.width, image.height);
+            if(idx < imgData.length-1)
+            doc.addPage();
+        })
+        try{
+           // doc.save('file.pdf');
+            alert(`${imgData.length}개의 이미지가 저장됐습니다.`);
+        }catch(e){
+            alert(e);
+        }finally{
+           checkLoading(obj, false);
+        }
+    }
+</script>
